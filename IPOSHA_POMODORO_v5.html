@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPPO SHARIYAKKITHARA</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary:      #00A86B;
+    --primary-deep: #007a4d;
+    --primary-bright:#00d488;
+    --mesh-1:       rgba(0,220,140,0.32);
+    --mesh-2:       rgba(0,70,44,0.55);
+    --mesh-3:       rgba(0,168,107,0.18);
+    --panel-bg:     rgba(0,80,48,0.55);
+    --white:        #ffffff;
+    --circ:         691.15;
+  }
+
+  /* ── Purple theme ───────────────────────────────── */
+  [data-theme="purple"] {
+    --primary:       #5B1F5D;
+    --primary-deep:  #3d1440;
+    --primary-bright:#9b3fa0;
+    --mesh-1:        rgba(150,60,155,0.32);
+    --mesh-2:        rgba(40,8,45,0.58);
+    --mesh-3:        rgba(91,31,93,0.20);
+    --panel-bg:      rgba(48,10,52,0.60);
+  }
+
+  /* ── Pink / Red theme ───────────────────────────── */
+  [data-theme="pink"] {
+    --primary:       #F45B69;
+    --primary-deep:  #b83040;
+    --primary-bright:#ff8a96;
+    --mesh-1:        rgba(255,100,115,0.32);
+    --mesh-2:        rgba(110,18,28,0.58);
+    --mesh-3:        rgba(244,91,105,0.20);
+    --panel-bg:      rgba(120,22,32,0.60);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Exo 2', sans-serif;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    overflow: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.5s ease;
+  }
+
+  /* ── Background layers ───────────────────────────── */
+  .bg-mesh {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 8%,  var(--mesh-1) 0%, transparent 58%),
+      radial-gradient(ellipse 55% 75% at 88% 92%, var(--mesh-2) 0%, transparent 55%),
+      radial-gradient(ellipse 45% 38% at 62% 48%, var(--mesh-3) 0%, transparent 50%);
+    transition: background 0.5s ease;
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .deco {
+    position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+  }
+  .deco-1 {
+    width: 420px; height: 420px; top: -110px; left: -110px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 65%);
+  }
+  .deco-2 {
+    width: 320px; height: 320px; bottom: -90px; right: -90px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 65%);
+  }
+  .deco-3 {
+    width: 190px; height: 190px; top: 28%; right: 4%;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .line { position: fixed; pointer-events: none; z-index: 0; }
+  .line-v1 { width:1px; height:60vh; top:18%; left:7%;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent); }
+  .line-v2 { width:1px; height:42vh; top:9%; right:11%;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.10), transparent); }
+  .line-h1 { height:1px; width:36vw; top:14%; left:50%; transform:translateX(-50%);
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.10), transparent); }
+
+  /* ── App shell ───────────────────────────────────── */
+  .app {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 18px;
+    padding: 16px;
+    width: 100%; max-width: 420px;
+  }
+
+  .app-title {
+    font-size: 12px; font-weight: 300;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    position: relative; text-align: center;
+  }
+  .app-title::before, .app-title::after {
+    content: ''; position: absolute; top: 50%;
+    width: 38px; height: 1px; background: rgba(255,255,255,0.28);
+  }
+  .app-title::before { right: calc(100% + 10px); }
+  .app-title::after  { left:  calc(100% + 10px); }
+
+  /* Mode badge — editable */
+  .mode-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 18px; border-radius: 100px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.20);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.4s ease;
+    user-select: none;
+    cursor: text;
+    position: relative;
+  }
+  .mode-badge.is-break { background: rgba(255,255,255,0.16); cursor: default; }
+
+  /* The editable label */
+  #modeLabel {
+    outline: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+    min-width: 10px;
+    white-space: nowrap;
+  }
+  #modeLabel:focus {
+    border-bottom: 1px solid rgba(255,255,255,0.50);
+    cursor: text;
+  }
+  /* Pencil hint icon */
+  .mode-edit-hint {
+    font-size: 9px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: rgba(255,255,255,0.55);
+    pointer-events: none;
+    margin-left: -4px;
+  }
+  .mode-badge:hover .mode-edit-hint { opacity: 1; }
+  .mode-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #fff;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%     { opacity:0.4; transform:scale(0.75); }
+  }
+
+  /* ── Glass card ──────────────────────────────────── */
+  .card {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 28px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -1px 0 rgba(0,0,0,0.12);
+    padding: 28px 26px 24px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+  }
+
+  /* ── Progress ring ───────────────────────────────── */
+  .ring-wrap {
+    position: relative; width: 192px; height: 192px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ring-svg {
+    position: absolute; top: 0; left: 0;
+    transform: rotate(-90deg);
+  }
+  .ring-track {
+    fill: none; stroke: rgba(255,255,255,0.10); stroke-width: 3;
+  }
+  .ring-progress {
+    fill: none;
+    stroke: rgba(255,255,255,0.82);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 552.92;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 7px rgba(255,255,255,0.55));
+    /* Transition added/removed by JS */
+    transition: stroke-dashoffset 0.95s linear;
+  }
+
+  /* Timer face */
+  .timer-face {
+    display: flex; flex-direction: column;
+    align-items: center; z-index: 1;
+  }
+  .timer-digits {
+    font-size: 58px; font-weight: 700;
+    letter-spacing: -2px; line-height: 1;
+    color: #fff;
+    text-shadow: 0 0 28px rgba(255,255,255,0.28);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .timer-sub {
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-top: 6px;
+  }
+
+  /* Divider */
+  .divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent);
+  }
+
+  /* Count row */
+  .count-row {
+    width: 100%; display: flex;
+    align-items: center; justify-content: space-between;
+  }
+  .count-label {
+    font-size: 10px; font-weight: 400;
+    letter-spacing: 0.17em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .count-pips { display: flex; gap: 7px; align-items: center; }
+  .pip {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    transition: background 0.35s ease, box-shadow 0.35s ease;
+  }
+  .pip.on {
+    background: rgba(255,255,255,0.88);
+    box-shadow: 0 0 8px rgba(255,255,255,0.55);
+  }
+  .count-num {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #fff;
+    min-width: 28px; text-align: right;
+  }
+
+  /* ── Glass buttons ───────────────────────────────── */
+  .btn-row {
+    display: flex; gap: 14px;
+    align-items: center; justify-content: center;
+    width: 100%;
+  }
+  .btn {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: #fff; border: none; cursor: pointer;
+    border-radius: 100px; padding: 0;
+    background: transparent; outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.95) translateY(1px); }
+  .btn-face {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; border-radius: 100px; padding: 14px 30px;
+    background: linear-gradient(
+      145deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.08) 55%,
+      rgba(255,255,255,0.04) 100%
+    );
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow:
+      0 6px 20px rgba(0,0,0,0.22),
+      0 1px 3px  rgba(0,0,0,0.18),
+      inset 0 1.5px 0 rgba(255,255,255,0.38),
+      inset 0 -1px  0 rgba(0,0,0,0.16);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    position: relative; overflow: hidden;
+    transition: box-shadow 0.18s ease, background 0.18s ease;
+  }
+  /* Specular gloss */
+  .btn-face::before {
+    content: '';
+    position: absolute; top: 0; left: -20%; width: 55%; height: 48%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.22), transparent);
+    border-radius: 100px; pointer-events: none;
+  }
+  .btn:hover .btn-face {
+    box-shadow:
+      0 9px 28px rgba(0,0,0,0.28),
+      0 2px 5px  rgba(0,0,0,0.18),
+      inset 0 1.5px 0 rgba(255,255,255,0.42),
+      inset 0 -1px  0 rgba(0,0,0,0.12);
+    background: linear-gradient(
+      145deg,
+      rgba(255,255,255,0.28) 0%,
+      rgba(255,255,255,0.11) 55%,
+      rgba(255,255,255,0.06) 100%
+    );
+  }
+  .btn-primary .btn-face { padding: 15px 44px; }
+  .btn-icon { font-size: 15px; line-height: 1; }
+
+  /* ── Toast ───────────────────────────────────────── */
+  .toast {
+    position: fixed; top: 26px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(0,0,0,0.38);
+    border: 1px solid rgba(255,255,255,0.20);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 100px; padding: 11px 24px;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
+    color: #fff; white-space: nowrap; z-index: 999;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.22);
+    transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease;
+    opacity: 0; pointer-events: none;
+  }
+  .toast.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* Dev credit */
+  .dev {
+    position: fixed; bottom: 16px; right: 20px;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.12em; color: rgba(255,255,255,0.30);
+    z-index: 10; pointer-events: none;
+    font-family: 'Exo 2', sans-serif;
+  }
+
+  /* ═══ ROCKET ════════════════════════════════════════ */
+  .rocket-wrap {
+    position: fixed;
+    bottom: 28px; left: 28px;
+    z-index: 20;
+    pointer-events: none;
+    width: 70px;
+    transform-origin: center bottom;
+  }
+  .rocket-svg { display: block; overflow: visible; }
+
+  /* Fuel fill layers — hidden until lit */
+  .fuel-bot, .fuel-mid, .fuel-top {
+    transition: opacity 0.8s ease, filter 0.8s ease;
+    opacity: 0;
+  }
+  .fuel-bot.lit { opacity: 1; }
+  .fuel-mid.lit { opacity: 1; }
+  .fuel-top.lit { opacity: 1; }
+
+  /* Idle bob */
+  @keyframes bob {
+    0%,100% { transform: translateY(0);  }
+    50%     { transform: translateY(-6px); }
+  }
+  .rocket-wrap.idle { animation: bob 3.2s ease-in-out infinite; }
+
+  /* Pre-launch shake */
+  @keyframes shake {
+    0%,100%{ transform:translateX(0) rotate(0deg); }
+    20%    { transform:translateX(-4px) rotate(-2.5deg); }
+    40%    { transform:translateX(4px)  rotate(2.5deg); }
+    60%    { transform:translateX(-3px) rotate(-1.5deg); }
+    80%    { transform:translateX(3px)  rotate(1.5deg); }
+  }
+  .rocket-wrap.shaking { animation: shake 0.13s linear infinite; }
+
+  /* Thruster flame visibility */
+  .thruster { opacity: 0; transform-origin: 50% 0%; }
+  @keyframes flicker {
+    0%,100%{ transform:scaleY(1) scaleX(1); }
+    30%    { transform:scaleY(1.4) scaleX(0.8); }
+    60%    { transform:scaleY(0.7) scaleX(1.2); }
+  }
+  .rocket-wrap.shaking  .thruster,
+  .rocket-wrap.launching .thruster,
+  .rocket-wrap.orbiting  .thruster {
+    opacity: 1;
+    animation: flicker 0.16s linear infinite;
+  }
+
+  /* Launch — animate position via JS (we use a CSS class + keyframe) */
+  /* We'll drive the launch via JS requestAnimationFrame for control */
+
+  /* Orbit float at top */
+  @keyframes orbit {
+    0%,100%{ transform:translateY(0)  rotate(-4deg); }
+    50%    { transform:translateY(8px) rotate(-1deg); }
+  }
+  .rocket-wrap.orbiting {
+    animation: orbit 2.6s ease-in-out infinite;
+  }
+  /* Each successive parked rocket gets a slightly offset phase */
+  .rocket-wrap.orbiting:nth-of-type(2) { animation-delay: -0.8s; }
+  .rocket-wrap.orbiting:nth-of-type(3) { animation-delay: -1.6s; }
+  .rocket-wrap.orbiting:nth-of-type(4) { animation-delay: -0.4s; }
+  .rocket-wrap.orbiting:nth-of-type(5) { animation-delay: -1.2s; }
+
+  /* ═══ SETTINGS ══════════════════════════════════════ */
+  .settings-btn {
+    position: fixed;
+    /* Positioned right of the app card, aligned to card top — set via JS */
+    z-index: 20; cursor: pointer;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 50%;
+    width: 36px; height: 36px;   /* 34 × 1.05 ≈ 36 */
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;              /* 15 × 1.05 ≈ 16 */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.2s ease, transform 0.35s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18),
+                inset 0 1px 0 rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.80);
+    user-select: none;
+  }
+  .settings-btn:hover { background: rgba(255,255,255,0.18); }
+  .settings-btn.open  { transform: rotate(45deg); }
+
+  /* Overlay backdrop */
+  .settings-overlay {
+    position: fixed; inset: 0; z-index: 30;
+    display: none;
+  }
+  .settings-overlay.open { display: block; }
+
+  /* Panel — opens rightward from the gear button */
+  .settings-panel {
+    position: fixed;
+    z-index: 31;
+    width: 220px;
+    background: var(--panel-bg);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 20px;
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.30),
+                inset 0 1px 0 rgba(255,255,255,0.22);
+    padding: 18px 20px 16px;
+    transform: translateX(-8px) scale(0.96);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                opacity 0.2s ease;
+  }
+  .settings-panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
+    border-radius: 20px 20px 0 0;
+  }
+  .settings-panel.open {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .settings-title {
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.50);
+    margin-bottom: 14px;
+  }
+
+  .settings-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .settings-row:last-child { margin-bottom: 0; }
+
+  .settings-row-label {
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.80);
+    letter-spacing: 0.04em;
+    flex: 1;
+  }
+
+  .stepper {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stepper-val {
+    font-size: 15px; font-weight: 700;
+    color: #fff; min-width: 26px; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .stepper-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff; font-size: 14px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.20);
+    font-family: 'Exo 2', sans-serif;
+  }
+  .stepper-btn:hover  { background: rgba(255,255,255,0.22); }
+  .stepper-btn:active { transform: scale(0.90); }
+
+  .settings-divider {
+    height: 1px; margin: 12px 0;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
+  }
+
+  .settings-apply {
+    width: 100%; padding: 9px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff; font-family: 'Exo 2', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: background 0.15s ease;
+    margin-top: 4px;
+  }
+  .settings-apply:hover { background: rgba(255,255,255,0.22); }
+  #fwCanvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 19;
+    opacity: 0; transition: opacity 0.5s ease;
+  }
+  #fwCanvas.visible { opacity: 1; }
+
+  /* ── Theme colour picker ─────────────────────────── */
+  .theme-picker {
+    position: fixed;
+    top: 18px; right: 18px;
+    z-index: 25;
+    display: flex; gap: 8px; align-items: center;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 100px;
+    padding: 6px 10px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18),
+                inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .theme-swatch {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.25);
+    transition: transform 0.2s ease, border-color 0.2s ease,
+                box-shadow 0.2s ease;
+    position: relative;
+  }
+  .theme-swatch:hover {
+    transform: scale(1.20);
+    border-color: rgba(255,255,255,0.70);
+  }
+  .theme-swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.30),
+                0 0 8px rgba(255,255,255,0.25);
+    transform: scale(1.15);
+  }
+  .theme-swatch[data-theme="green"]  { background: #00A86B; }
+  .theme-swatch[data-theme="purple"] { background: #5B1F5D; }
+  .theme-swatch[data-theme="pink"]   { background: #F45B69; }
+
+  /* ── Auto / Manual toggle ────────────────────────── */
+  .mode-toggle {
+    display: flex; align-items: center; gap: 10px;
+    user-select: none;
+  }
+  .mode-toggle-label {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.50);
+    transition: color 0.3s ease;
+    min-width: 44px;
+  }
+  .mode-toggle-label.active {
+    color: rgba(255,255,255,0.90);
+  }
+  .toggle-track {
+    position: relative;
+    width: 44px; height: 24px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: background 0.35s ease, border-color 0.35s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .toggle-track.is-auto {
+    background: rgba(255,255,255,0.20);
+    border-color: rgba(255,255,255,0.38);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.10),
+                0 0 12px rgba(255,255,255,0.12);
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.70);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25),
+                0 0 0 1px rgba(255,255,255,0.15);
+    transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1),
+                background 0.3s ease;
+  }
+  .toggle-track.is-auto .toggle-thumb {
+    transform: translateX(20px);
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.22),
+                0 0 8px rgba(255,255,255,0.40);
+  }
+  /* ── Graph button (right-middle) ─────────────────── */
+  .graph-btn {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: pointer;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    padding: 14px 8px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: -3px 0 16px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.18);
+    transition: background 0.2s ease, color 0.2s ease, padding 0.2s ease;
+    user-select: none;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .graph-btn:hover {
+    background: rgba(255,255,255,0.16);
+    color: rgba(255,255,255,0.95);
+    padding-right: 12px;
+  }
+  .graph-btn-icon { font-size: 13px; writing-mode: horizontal-tb; }
+
+  /* ── Chart modal ─────────────────────────────────── */
+  .chart-overlay {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .chart-overlay.open {
+    opacity: 1; pointer-events: all;
+  }
+  .chart-panel {
+    background: rgba(10,10,10,0.60);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 28px;
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45),
+                inset 0 1px 0 rgba(255,255,255,0.18);
+    padding: 28px 28px 24px;
+    width: min(480px, 92vw);
+    position: relative;
+    transform: translateY(18px) scale(0.97);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .chart-overlay.open .chart-panel {
+    transform: translateY(0) scale(1);
+  }
+  .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .chart-title {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+  .chart-close {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.70);
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+  }
+  .chart-close:hover { background: rgba(255,255,255,0.20); }
+  .chart-month-nav {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 20px;
+  }
+  .chart-month-label {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 0.04em; color: #fff;
+    min-width: 160px; text-align: center;
+  }
+  .chart-nav-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.80);
+    font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .chart-nav-btn:hover { background: rgba(255,255,255,0.22); }
+  .chart-canvas-wrap {
+    position: relative; width: 100%; height: 180px;
+    margin-bottom: 12px;
+  }
+  #chartCanvas { width: 100%; height: 100%; display: block; }
+  .chart-summary {
+    display: flex; gap: 20px; justify-content: center;
+    margin-top: 4px;
+  }
+  .chart-stat {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .chart-stat-val {
+    font-size: 20px; font-weight: 700; color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .chart-stat-lbl {
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(255,255,255,0.40);
+  }
+  .chart-empty {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%;
+    font-size: 12px; color: rgba(255,255,255,0.30);
+    letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+<div class="deco deco-1"></div>
+<div class="deco deco-2"></div>
+<div class="deco deco-3"></div>
+<div class="line line-v1"></div>
+<div class="line line-v2"></div>
+<div class="line line-h1"></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="app">
+
+  <div class="app-title">ഇപ്പോ ശരിയാക്കിത്തര !</div>
+
+  <div class="mode-badge" id="modeBadge">
+    <div class="mode-dot"></div>
+    <span id="modeLabel" contenteditable="true" spellcheck="false" title="Click to rename">Work Session</span>
+    <span class="mode-edit-hint">✏</span>
+  </div>
+
+  <div class="card">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="192" height="192" viewBox="0 0 192 192" aria-hidden="true">
+        <circle class="ring-track"    cx="96" cy="96" r="88"/>
+        <circle class="ring-progress" cx="96" cy="96" r="88" id="ringArc"/>
+      </svg>
+      <div class="timer-face">
+        <div class="timer-digits" id="digits">25:00</div>
+        <div class="timer-sub">remaining</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="count-row">
+      <span class="count-label">Pomodoros</span>
+      <div class="count-pips" id="pips">
+        <div class="pip"></div>
+        <div class="pip"></div>
+        <div class="pip"></div>
+        <div class="pip"></div>
+      </div>
+      <div class="count-num" id="countNum">0</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnStart">
+      <div class="btn-face">
+        <span class="btn-icon" id="startIcon">▶</span>
+        <span id="startTxt">Start</span>
+      </div>
+    </button>
+    <button class="btn" id="btnNext">
+      <div class="btn-face">
+        <span class="btn-icon">⏭</span>
+        <span>Next</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="mode-toggle" id="modeToggleWrap" title="Toggle auto/manual session advance">
+    <span class="mode-toggle-label active" id="toggleLabelManual">Manual</span>
+    <div class="toggle-track" id="toggleTrack">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span class="mode-toggle-label" id="toggleLabelAuto">Auto</span>
+  </div>
+
+</div>
+
+<!-- ═══ GRAPH BUTTON ═══════════════════════════════════════ -->
+<div class="graph-btn" id="graphBtn" title="View monthly focus chart">
+  <span class="graph-btn-icon">📊</span>
+  <span>Graph</span>
+</div>
+
+<!-- ═══ CHART MODAL ════════════════════════════════════════ -->
+<div class="chart-overlay" id="chartOverlay">
+  <div class="chart-panel" id="chartPanel">
+    <div class="chart-header">
+      <span class="chart-title">Focus Minutes</span>
+      <button class="chart-close" id="chartClose">✕</button>
+    </div>
+    <div class="chart-month-nav">
+      <button class="chart-nav-btn" id="chartPrev">◀</button>
+      <div class="chart-month-label" id="chartMonthLabel">—</div>
+      <button class="chart-nav-btn" id="chartNext">▶</button>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chartCanvas"></canvas>
+    </div>
+    <div class="chart-summary" id="chartSummary"></div>
+  </div>
+</div>
+
+<div class="dev">@jarhead.org</div>
+
+<!-- ═══ THEME PICKER ══════════════════════════════════════ -->
+<div class="theme-picker" id="themePicker">
+  <div class="theme-swatch active" data-theme="green"  title="Jade Green"></div>
+  <div class="theme-swatch"        data-theme="purple" title="Deep Purple"></div>
+  <div class="theme-swatch"        data-theme="pink"   title="Coral Pink"></div>
+</div>
+
+<!-- ═══ SETTINGS ══════════════════════════════════════════ -->
+<div class="settings-btn" id="settingsBtn" title="Customize timers">⚙</div>
+
+<div class="settings-overlay" id="settingsOverlay"></div>
+
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-title">Timer Settings</div>
+
+  <div class="settings-row">
+    <span class="settings-row-label">Work (min)</span>
+    <div class="stepper">
+      <button class="stepper-btn" id="workMinus">−</button>
+      <span class="stepper-val" id="workVal">25</span>
+      <button class="stepper-btn" id="workPlus">+</button>
+    </div>
+  </div>
+
+  <div class="settings-divider"></div>
+
+  <div class="settings-row">
+    <span class="settings-row-label">Break (min)</span>
+    <div class="stepper">
+      <button class="stepper-btn" id="breakMinus">−</button>
+      <span class="stepper-val" id="breakVal">5</span>
+      <button class="stepper-btn" id="breakPlus">+</button>
+    </div>
+  </div>
+
+  <div class="settings-divider"></div>
+
+  <button class="settings-apply" id="settingsApply">Apply & Reset</button>
+</div>
+
+<!-- ═══ ROCKET ════════════════════════════════════════════ -->
+<!--
+  Pencil-sketch style rocket: hand-drawn stroke aesthetic,
+  three fillable thirds, nose cone, fins, porthole, thruster.
+  ViewBox: 0 0 60 160  (60px wide, 160px tall)
+  Sections (bottom-up):
+    Lower third fill:  y 105–140  (body bottom)
+    Mid third fill:    y  70–105  (body mid)
+    Upper third fill:  y  35–70   (body top + shoulder)
+  The fill rects are clipped to the body silhouette via clipPath.
+-->
+<div class="rocket-wrap idle" id="rocketWrap">
+  <svg class="rocket-svg" viewBox="0 0 60 170" xmlns="http://www.w3.org/2000/svg"
+       width="70" height="187">
+    <defs>
+      <!-- Clip path = body shape (rough pencil polygon) -->
+      <clipPath id="bodyClip">
+        <!-- nose cone + body + shoulder flair -->
+        <path d="M30,4 C30,4 18,28 16,50 L16,130 C16,134 18,138 22,140
+                 L38,140 C42,138 44,134 44,130 L44,50 C42,28 30,4 30,4 Z"/>
+      </clipPath>
+      <!-- Glow filters for each lit section -->
+      <filter id="glowOrange" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glowYellow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glowWhite" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- ── FUEL FILL LAYERS (behind outline, clipped) ─── -->
+    <!-- Lower third (pomodoro 1) — warm orange glow -->
+    <g class="fuel-bot" id="fuelBot" clip-path="url(#bodyClip)">
+      <rect x="0" y="102" width="60" height="42"
+            fill="rgba(255,140,0,0.55)" filter="url(#glowOrange)"/>
+      <!-- pencil texture lines -->
+      <line x1="18" y1="108" x2="42" y2="108" stroke="rgba(255,180,60,0.4)" stroke-width="1" stroke-dasharray="2,3"/>
+      <line x1="18" y1="116" x2="42" y2="116" stroke="rgba(255,180,60,0.35)" stroke-width="1" stroke-dasharray="3,4"/>
+      <line x1="18" y1="124" x2="42" y2="124" stroke="rgba(255,180,60,0.3)" stroke-width="1" stroke-dasharray="2,5"/>
+    </g>
+
+    <!-- Mid third (pomodoro 2) — amber/gold -->
+    <g class="fuel-mid" id="fuelMid" clip-path="url(#bodyClip)">
+      <rect x="0" y="66" width="60" height="36"
+            fill="rgba(255,200,0,0.50)" filter="url(#glowYellow)"/>
+      <line x1="18" y1="73" x2="42" y2="73" stroke="rgba(255,230,80,0.4)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="18" y1="82" x2="42" y2="82" stroke="rgba(255,230,80,0.35)" stroke-width="1" stroke-dasharray="2,4"/>
+      <line x1="18" y1="91" x2="42" y2="91" stroke="rgba(255,230,80,0.3)" stroke-width="1" stroke-dasharray="3,5"/>
+    </g>
+
+    <!-- Upper third (pomodoro 3) — white-hot -->
+    <g class="fuel-top" id="fuelTop" clip-path="url(#bodyClip)">
+      <rect x="0" y="30" width="60" height="36"
+            fill="rgba(255,255,220,0.55)" filter="url(#glowWhite)"/>
+      <line x1="20" y1="37" x2="40" y2="37" stroke="rgba(255,255,200,0.5)" stroke-width="1" stroke-dasharray="2,3"/>
+      <line x1="19" y1="46" x2="41" y2="46" stroke="rgba(255,255,200,0.4)" stroke-width="1" stroke-dasharray="3,4"/>
+      <line x1="18" y1="55" x2="42" y2="55" stroke="rgba(255,255,200,0.35)" stroke-width="1" stroke-dasharray="2,5"/>
+    </g>
+
+    <!-- ── PENCIL SKETCH OUTLINE ─────────────────────── -->
+
+    <!-- Left fin -->
+    <path d="M16,120 C10,122 7,128 8,140 L16,138 Z"
+          fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Left fin inner sketch line -->
+    <path d="M15,124 C11,127 9,133 10,139"
+          fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.8"
+          stroke-linecap="round" stroke-dasharray="2,2"/>
+
+    <!-- Right fin -->
+    <path d="M44,120 C50,122 53,128 52,140 L44,138 Z"
+          fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Right fin inner sketch line -->
+    <path d="M45,124 C49,127 51,133 50,139"
+          fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.8"
+          stroke-linecap="round" stroke-dasharray="2,2"/>
+
+    <!-- Body outline (rough pencil) -->
+    <path d="M30,5 C29,5 18,29 16.5,51 L16,130 C16,134.5 18.5,138.5 22.5,140.5
+             L37.5,140.5 C41.5,138.5 44,134.5 44,130 L43.5,51 C42,29 31,5 30,5 Z"
+          fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Pencil wobble on left edge -->
+    <path d="M16.5,80 C15.8,85 16.2,90 16,95"
+          fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.7"
+          stroke-linecap="round" stroke-dasharray="1,4"/>
+
+    <!-- Nose cone inner shading line -->
+    <path d="M26,18 C25,26 22,36 20,46"
+          fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.8"
+          stroke-linecap="round" stroke-dasharray="2,3"/>
+
+    <!-- Porthole (window) -->
+    <circle cx="30" cy="85" r="7.5"
+            fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="1.5"/>
+    <!-- Porthole cross-hair sketch lines -->
+    <line x1="30" y1="79" x2="30" y2="91" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+    <line x1="24" y1="85" x2="36" y2="85" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+    <!-- Porthole glint -->
+    <circle cx="27.5" cy="82.5" r="1.5" fill="rgba(255,255,255,0.45)"/>
+
+    <!-- Body horizontal panel lines (sketch hatching) -->
+    <line x1="17.5" y1="66" x2="42.5" y2="66"
+          stroke="rgba(255,255,255,0.22)" stroke-width="0.9" stroke-dasharray="3,4"/>
+    <line x1="16.5" y1="102" x2="43.5" y2="102"
+          stroke="rgba(255,255,255,0.22)" stroke-width="0.9" stroke-dasharray="3,4"/>
+
+    <!-- Nozzle bell -->
+    <path d="M22,140 C21,144 20,148 19,152 L41,152 C40,148 39,144 38,140 Z"
+          fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Nozzle inner sketch line -->
+    <line x1="26" y1="141" x2="24" y2="151" stroke="rgba(255,255,255,0.22)"
+          stroke-width="0.8" stroke-dasharray="2,3"/>
+    <line x1="34" y1="141" x2="36" y2="151" stroke="rgba(255,255,255,0.22)"
+          stroke-width="0.8" stroke-dasharray="2,3"/>
+
+    <!-- ── THRUSTER FLAME ─────────────────────────────── -->
+    <g class="thruster" id="rocketThruster">
+      <!-- Outer flame -->
+      <path d="M20,152 C18,160 17,168 30,175 C43,168 42,160 40,152 Z"
+            fill="rgba(255,120,0,0.7)"/>
+      <!-- Mid flame -->
+      <path d="M22,152 C21,159 20,165 30,170 C40,165 39,159 38,152 Z"
+            fill="rgba(255,200,40,0.75)"/>
+      <!-- Inner hot core -->
+      <path d="M25,152 C24,157 23,162 30,165 C37,162 36,157 35,152 Z"
+            fill="rgba(255,255,200,0.85)"/>
+    </g>
+
+    <!-- Tiny sketch detail: rivet dots -->
+    <circle cx="20" cy="70" r="1" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="20" cy="106" r="1" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="40" cy="106" r="1" fill="rgba(255,255,255,0.35)"/>
+
+  </svg>
+</div>
+
+<!-- Fireworks canvas -->
+<canvas id="fwCanvas"></canvas>
+
+<script>
+'use strict';
+
+/* ============================================================
+   CONSTANTS
+============================================================ */
+var WORK_SECS  = 25 * 60;
+var BREAK_SECS =  5 * 60;
+const CIRC       = 2 * Math.PI * 88;  // 552.92
+
+/* ============================================================
+   AUDIO  — Web Audio API, lazy-init on first gesture
+============================================================ */
+let _audioCtx = null;
+
+function getAudioCtx() {
+  if (!_audioCtx) {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function _note(ac, freq, type, start, duration, gain) {
+  const osc = ac.createOscillator();
+  const env = ac.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  env.gain.setValueAtTime(0, start);
+  env.gain.linearRampToValueAtTime(gain, start + 0.025);
+  env.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  osc.connect(env);
+  env.connect(ac.destination);
+  osc.start(start);
+  osc.stop(start + duration + 0.01);
+}
+
+function soundClick() {
+  try {
+    const ac = getAudioCtx(), t = ac.currentTime;
+    _note(ac, 900, 'sine',     t,        0.08, 0.14);
+    _note(ac, 660, 'sine',     t + 0.04, 0.06, 0.08);
+  } catch(e) {}
+}
+
+function soundWorkDone() {
+  try {
+    const ac = getAudioCtx();
+    // Bright ascending chime C5→E5→G5→C6
+    [523, 659, 784, 1047].forEach(function(f, i) {
+      _note(ac, f, 'sine', ac.currentTime + i * 0.17, 0.55, 0.18);
+    });
+  } catch(e) {}
+}
+
+function soundBreakDone() {
+  try {
+    const ac = getAudioCtx();
+    // Warm descending triangle G5→E5→C5→A4
+    [784, 659, 523, 440].forEach(function(f, i) {
+      _note(ac, f, 'triangle', ac.currentTime + i * 0.20, 0.60, 0.15);
+    });
+  } catch(e) {}
+}
+
+/* ============================================================
+   DOM REFS
+============================================================ */
+const elDigits    = document.getElementById('digits');
+const elModeLabel = document.getElementById('modeLabel');
+const elModeBadge = document.getElementById('modeBadge');
+const elStartTxt  = document.getElementById('startTxt');
+const elStartIcon = document.getElementById('startIcon');
+const elCountNum  = document.getElementById('countNum');
+const elPips      = document.querySelectorAll('#pips .pip');
+const elRingArc   = document.getElementById('ringArc');
+const elToast     = document.getElementById('toast');
+const btnStart    = document.getElementById('btnStart');
+const btnNext     = document.getElementById('btnNext');
+
+/* ============================================================
+   AUTO / MANUAL TOGGLE
+============================================================ */
+var autoMode = false;  // default: manual
+
+var elToggleTrack       = document.getElementById('toggleTrack');
+var elToggleLabelManual = document.getElementById('toggleLabelManual');
+var elToggleLabelAuto   = document.getElementById('toggleLabelAuto');
+
+function setAutoMode(val) {
+  autoMode = val;
+  elToggleTrack.classList.toggle('is-auto', val);
+  elToggleLabelManual.classList.toggle('active', !val);
+  elToggleLabelAuto.classList.toggle('active', val);
+  showToast(val ? '⚡ Auto — sessions advance automatically' : '🖐 Manual — press Next to advance');
+}
+
+elToggleTrack.addEventListener('click', function() {
+  setAutoMode(!autoMode);
+});
+
+/* ============================================================
+   STATE
+============================================================ */
+var state = {
+  mode:      'work',   // 'work' | 'break'
+  running:   false,
+  remaining: WORK_SECS,
+  total:     WORK_SECS,
+  count:     0,        // completed work sessions
+  endTime:   null,     // Date.now() when current session ends
+  tickId:    null,
+  autoStartPending: false
+};
+
+/* ============================================================
+   RENDER HELPERS
+============================================================ */
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function fmtTime(sec) {
+  return pad(Math.floor(sec / 60)) + ':' + pad(sec % 60);
+}
+
+function renderDigits(sec) {
+  elDigits.textContent = fmtTime(sec);
+}
+
+function renderRing(remaining, total) {
+  var progress = (total > 0) ? (remaining / total) : 1;
+  var offset   = CIRC * (1 - progress);
+  elRingArc.style.strokeDashoffset = offset;
+}
+
+function snapRingFull() {
+  // Disable transition, snap to full ring, re-enable transition
+  elRingArc.style.transition = 'none';
+  elRingArc.style.strokeDashoffset = 0;
+  // Force reflow
+  void elRingArc.getBoundingClientRect();
+  elRingArc.style.transition = 'stroke-dashoffset 0.95s linear';
+}
+
+function renderPips(count) {
+  var slot = count % 4;
+  elPips.forEach(function(pip, i) {
+    if (i < slot) pip.classList.add('on');
+    else pip.classList.remove('on');
+  });
+}
+
+function renderCount(count) {
+  elCountNum.textContent = count;
+  renderPips(count);
+}
+
+function renderMode(mode) {
+  var isWork = mode === 'work';
+  elModeLabel.textContent = isWork ? 'Work Session' : 'Break Time';
+  elModeBadge.classList.toggle('is-break', !isWork);
+  snapRingFull();
+}
+
+function renderStartBtn(running) {
+  elStartIcon.textContent = running ? '⏸' : '▶';
+  elStartTxt.textContent  = running ? 'Pause' : 'Start';
+}
+
+var _toastTimer = null;
+function showToast(msg) {
+  elToast.textContent = msg;
+  elToast.classList.add('visible');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() {
+    elToast.classList.remove('visible');
+  }, 3200);
+}
+
+/* ============================================================
+   TIMER CORE
+   Uses Date.now() as source of truth. setInterval is just
+   a wakeup signal — remaining time is always recalculated
+   from (endTime - Date.now()), so it's drift-proof.
+============================================================ */
+function clearTick() {
+  if (state.tickId !== null) {
+    clearInterval(state.tickId);
+    state.tickId = null;
+  }
+}
+
+function tick() {
+  if (!state.running) return;
+
+  var now = Date.now();
+  var rem = Math.max(0, Math.round((state.endTime - now) / 1000));
+  state.remaining = rem;
+
+  renderDigits(rem);
+  renderRing(rem, state.total);
+
+  if (rem === 0) {
+    clearTick();
+    state.running = false;
+    renderStartBtn(false);
+    handleSessionComplete();
+  }
+}
+
+function startTimer() {
+  if (state.running) return;
+  if (state.remaining <= 0) return; // safety guard
+
+  state.running = true;
+  state.endTime = Date.now() + state.remaining * 1000;
+  renderStartBtn(true);
+
+  // Fire once immediately, then every 500ms for accuracy
+  tick();
+  state.tickId = setInterval(tick, 500);
+}
+
+function pauseTimer() {
+  if (!state.running) return;
+  clearTick();
+  state.running = false;
+  // remaining is up-to-date from last tick
+  renderStartBtn(false);
+}
+
+function switchMode(newMode) {
+  state.mode      = newMode;
+  state.total     = newMode === 'work' ? WORK_SECS : BREAK_SECS;
+  state.remaining = state.total;
+  state.endTime   = null;
+  renderMode(newMode);
+  renderDigits(state.remaining);
+}
+
+function handleSessionComplete() {
+  if (state.mode === 'work') {
+    state.count++;
+    renderCount(state.count);
+    soundWorkDone();
+    // ── Record minutes to history ──
+    recordFocusMinutes(Math.round(WORK_SECS / 60));
+    if (autoMode) {
+      showToast('🎯 Work done! Starting break…');
+      switchMode('break');
+    } else {
+      showToast('🎯 Work session done! Press Next for break.');
+      switchMode('break');
+    }
+  } else {
+    soundBreakDone();
+    if (autoMode) {
+      showToast('☕ Break over! Starting work…');
+      switchMode('work');
+    } else {
+      showToast('☕ Break over! Press Next to focus.');
+      switchMode('work');
+    }
+  }
+
+  if (autoMode) {
+    // Auto mode: advance to next session automatically
+    state.autoStartPending = true;
+    setTimeout(function() {
+      if (state.autoStartPending && !state.running) {
+        state.autoStartPending = false;
+        startTimer();
+      }
+    }, 1800);
+  } else {
+    // Manual mode: stay paused, wait for user to press Next or Start
+    state.autoStartPending = false;
+    renderStartBtn(false);
+  }
+}
+
+/* ============================================================
+   BUTTON HANDLERS
+============================================================ */
+btnStart.addEventListener('click', function() {
+  soundClick();
+  state.autoStartPending = false; // cancel any pending auto-start race
+  if (state.running) {
+    pauseTimer();
+  } else {
+    startTimer();
+  }
+});
+
+btnNext.addEventListener('click', function() {
+  soundClick();
+  state.autoStartPending = false;
+  clearTick();
+  state.running = false;
+
+  if (state.mode === 'work') {
+    // Skipping a work session still counts it
+    state.count++;
+    renderCount(state.count);
+    showToast('⏭ Skipped to Break');
+    switchMode('break');
+  } else {
+    showToast('⏭ Skipped to Work');
+    switchMode('work');
+  }
+
+  renderStartBtn(false);
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+(function init() {
+  renderDigits(state.remaining);
+  renderRing(state.remaining, state.total);
+  renderMode(state.mode);
+  renderStartBtn(state.running);
+  renderCount(state.count);
+})();
+
+
+/* ============================================================
+   ROCKET ENGINE  v2
+   ─────────────────────────────────────────────────────────
+   One "staging" rocket sits bottom-left. Every 3 completed
+   pomodoros it launches and STAYS at the top, joining any
+   previously launched rockets. The staging rocket is then
+   freshly spawned at bottom-left for the next cycle.
+
+   Parked rockets hang at the top, spaced 80px apart from
+   the left edge, gently orbiting. Fireworks run for 5s
+   each time a new rocket arrives.
+============================================================ */
+(function RocketEngine() {
+
+  var fwCanvas = document.getElementById('fwCanvas');
+  var ctx2d    = fwCanvas.getContext('2d');
+
+  /* ── Resize canvas ───────────────────────────────── */
+  function resizeCanvas() {
+    fwCanvas.width  = window.innerWidth;
+    fwCanvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  /* ── Rocket SVG markup (shared template) ─────────── */
+  function rocketSVGInner() {
+    return '<defs>'
+      + '<clipPath id="bClip{{ID}}">'
+      + '<path d="M30,4 C30,4 18,28 16,50 L16,130 C16,134 18,138 22,140 L38,140 C42,138 44,134 44,130 L44,50 C42,28 30,4 30,4 Z"/>'
+      + '</clipPath>'
+      + '<filter id="gO{{ID}}"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+      + '<filter id="gY{{ID}}"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+      + '<filter id="gW{{ID}}"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+      + '</defs>'
+      /* fuel fills */
+      + '<g class="fuel-bot" clip-path="url(#bClip{{ID}})">'
+      + '<rect x="0" y="102" width="60" height="42" fill="rgba(255,255,220,0.55)" filter="url(#gO{{ID}})"/>'
+      + '<line x1="18" y1="108" x2="42" y2="108" stroke="rgba(255,255,200,0.5)" stroke-width="1" stroke-dasharray="2,3"/>'
+      + '<line x1="18" y1="116" x2="42" y2="116" stroke="rgba(255,255,200,0.4)" stroke-width="1" stroke-dasharray="3,4"/>'
+      + '<line x1="18" y1="124" x2="42" y2="124" stroke="rgba(255,255,200,0.35)" stroke-width="1" stroke-dasharray="2,5"/>'
+      + '</g>'
+      + '<g class="fuel-mid" clip-path="url(#bClip{{ID}})">'
+      + '<rect x="0" y="66" width="60" height="36" fill="rgba(255,255,220,0.55)" filter="url(#gY{{ID}})"/>'
+      + '<line x1="18" y1="73" x2="42" y2="73" stroke="rgba(255,255,200,0.5)" stroke-width="1" stroke-dasharray="3,3"/>'
+      + '<line x1="18" y1="82" x2="42" y2="82" stroke="rgba(255,255,200,0.4)" stroke-width="1" stroke-dasharray="2,4"/>'
+      + '<line x1="18" y1="91" x2="42" y2="91" stroke="rgba(255,255,200,0.35)" stroke-width="1" stroke-dasharray="3,5"/>'
+      + '</g>'
+      + '<g class="fuel-top" clip-path="url(#bClip{{ID}})">'
+      + '<rect x="0" y="30" width="60" height="36" fill="rgba(255,255,220,0.55)" filter="url(#gW{{ID}})"/>'
+      + '<line x1="20" y1="37" x2="40" y2="37" stroke="rgba(255,255,200,0.5)" stroke-width="1" stroke-dasharray="2,3"/>'
+      + '<line x1="19" y1="46" x2="41" y2="46" stroke="rgba(255,255,200,0.4)" stroke-width="1" stroke-dasharray="3,4"/>'
+      + '<line x1="18" y1="55" x2="42" y2="55" stroke="rgba(255,255,200,0.35)" stroke-width="1" stroke-dasharray="2,5"/>'
+      + '</g>'
+      /* outline + details */
+      + '<path d="M16,120 C10,122 7,128 8,140 L16,138 Z" fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M15,124 C11,127 9,133 10,139" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.8" stroke-linecap="round" stroke-dasharray="2,2"/>'
+      + '<path d="M44,120 C50,122 53,128 52,140 L44,138 Z" fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M45,124 C49,127 51,133 50,139" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.8" stroke-linecap="round" stroke-dasharray="2,2"/>'
+      + '<path d="M30,5 C29,5 18,29 16.5,51 L16,130 C16,134.5 18.5,138.5 22.5,140.5 L37.5,140.5 C41.5,138.5 44,134.5 44,130 L43.5,51 C42,29 31,5 30,5 Z" fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M16.5,80 C15.8,85 16.2,90 16,95" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.7" stroke-linecap="round" stroke-dasharray="1,4"/>'
+      + '<path d="M26,18 C25,26 22,36 20,46" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.8" stroke-linecap="round" stroke-dasharray="2,3"/>'
+      + '<circle cx="30" cy="85" r="7.5" fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="1.5"/>'
+      + '<line x1="30" y1="79" x2="30" y2="91" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>'
+      + '<line x1="24" y1="85" x2="36" y2="85" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>'
+      + '<circle cx="27.5" cy="82.5" r="1.5" fill="rgba(255,255,255,0.45)"/>'
+      + '<line x1="17.5" y1="66" x2="42.5" y2="66" stroke="rgba(255,255,255,0.22)" stroke-width="0.9" stroke-dasharray="3,4"/>'
+      + '<line x1="16.5" y1="102" x2="43.5" y2="102" stroke="rgba(255,255,255,0.22)" stroke-width="0.9" stroke-dasharray="3,4"/>'
+      + '<path d="M22,140 C21,144 20,148 19,152 L41,152 C40,148 39,144 38,140 Z" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<line x1="26" y1="141" x2="24" y2="151" stroke="rgba(255,255,255,0.22)" stroke-width="0.8" stroke-dasharray="2,3"/>'
+      + '<line x1="34" y1="141" x2="36" y2="151" stroke="rgba(255,255,255,0.22)" stroke-width="0.8" stroke-dasharray="2,3"/>'
+      /* thruster */
+      + '<g class="thruster">'
+      + '<path d="M20,152 C18,160 17,168 30,175 C43,168 42,160 40,152 Z" fill="rgba(255,120,0,0.7)"/>'
+      + '<path d="M22,152 C21,159 20,165 30,170 C40,165 39,159 38,152 Z" fill="rgba(255,200,40,0.75)"/>'
+      + '<path d="M25,152 C24,157 23,162 30,165 C37,162 36,157 35,152 Z" fill="rgba(255,255,200,0.85)"/>'
+      + '</g>'
+      /* rivets */
+      + '<circle cx="20" cy="70" r="1" fill="rgba(255,255,255,0.35)"/>'
+      + '<circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.35)"/>'
+      + '<circle cx="20" cy="106" r="1" fill="rgba(255,255,255,0.35)"/>'
+      + '<circle cx="40" cy="106" r="1" fill="rgba(255,255,255,0.35)"/>';
+  }
+
+  /* ── Create a rocket DOM element ─────────────────── */
+  var rocketIdCounter = 0;
+
+  function createRocketEl() {
+    var id  = ++rocketIdCounter;
+    var div = document.createElement('div');
+    div.className = 'rocket-wrap';
+    div.id = 'rocket-' + id;
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 60 170');
+    svg.setAttribute('width',  '49');
+    svg.setAttribute('height', '131');
+    svg.classList.add('rocket-svg');
+    svg.style.overflow = 'visible';
+    svg.innerHTML = rocketSVGInner().replace(/\{\{ID\}\}/g, id);
+
+    div.appendChild(svg);
+    document.body.appendChild(div);
+    return div;
+  }
+
+  /* ── Helpers: fuel on a specific rocket element ──── */
+  function setFuel(rocketEl, level) {
+    // level 0=none, 1=bot, 2=bot+mid, 3=all
+    var bot = rocketEl.querySelector('.fuel-bot');
+    var mid = rocketEl.querySelector('.fuel-mid');
+    var top = rocketEl.querySelector('.fuel-top');
+    if (bot) bot.classList.toggle('lit', level >= 1);
+    if (mid) mid.classList.toggle('lit', level >= 2);
+    if (top) top.classList.toggle('lit', level >= 3);
+  }
+
+  function setRocketPhase(rocketEl, phase) {
+    rocketEl.classList.remove('idle', 'shaking', 'launching', 'orbiting');
+    rocketEl.classList.add(phase);
+  }
+
+  /* ── Parked rockets registry ─────────────────────── */
+  // Each entry: { el, slotIndex }
+  var parkedRockets = [];
+
+  // Parked rockets sit at top-left, stacked horizontally 80px apart
+  // top = 18px from top of viewport
+  var PARK_TOP_PX      = 14;
+  var PARK_SLOT_GAP    = 56;
+  var PARK_LEFT_ORIGIN = 22;
+
+  function getParkPosition(slotIndex) {
+    return {
+      top:  PARK_TOP_PX,
+      left: PARK_LEFT_ORIGIN + slotIndex * PARK_SLOT_GAP
+    };
+  }
+
+  /* ── Staging rocket (the one at bottom-left) ─────── */
+  var stagingRocket  = null;
+  var cycleCount     = 0;   // 1..3
+  var isLaunching    = false;
+
+  function spawnStagingRocket() {
+    var el = createRocketEl();
+    el.style.position = 'fixed';
+    el.style.bottom   = '28px';
+    el.style.left     = '28px';
+    el.style.top      = 'auto';
+    setRocketPhase(el, 'idle');
+    stagingRocket = el;
+    cycleCount = 0;
+  }
+
+  /* ── Launch the staging rocket to next park slot ─── */
+  function launchStagingRocket() {
+    if (isLaunching) return;
+    isLaunching = true;
+
+    var el = stagingRocket;
+    setRocketPhase(el, 'shaking');
+
+    setTimeout(function() {
+
+      // Where does it start (current fixed bottom/left)
+      var rect        = el.getBoundingClientRect();
+      var fromTop     = rect.top;
+      var fromLeft    = rect.left;
+
+      // Where does it go
+      var slotIndex   = parkedRockets.length; // 0-based next slot
+      var parkPos     = getParkPosition(slotIndex);
+
+      // Switch from bottom-anchored to top-anchored for animation
+      el.style.bottom     = 'auto';
+      el.style.top        = fromTop + 'px';
+      el.style.left       = fromLeft + 'px';
+      el.style.transition = 'none';
+      void el.getBoundingClientRect(); // reflow
+
+      // Animate to park position
+      el.style.transition = 'top 1.5s cubic-bezier(0.16,1,0.3,1), left 1.5s cubic-bezier(0.16,1,0.3,1)';
+      el.style.top  = parkPos.top  + 'px';
+      el.style.left = parkPos.left + 'px';
+
+      setRocketPhase(el, 'launching');
+
+      setTimeout(function() {
+        // Landed — kill all animation, stay dead-still
+        el.style.transition = 'none';
+        el.style.top  = parkPos.top  + 'px';
+        el.style.left = parkPos.left + 'px';
+        el.classList.remove('idle', 'shaking', 'launching', 'orbiting');
+        // No phase class = no animation. Thruster also goes dark.
+
+        parkedRockets.push({ el: el, slotIndex: slotIndex });
+
+        // Fireworks!
+        startFireworks();
+        setTimeout(stopFireworks, 5000);
+
+        // Spawn fresh staging rocket for next cycle
+        isLaunching = false;
+        stagingRocket = null;
+        spawnStagingRocket();
+
+      }, 1600);
+
+    }, 850);
+  }
+
+  /* ── FIREWORKS ENGINE ────────────────────────────── */
+  var particles  = [];
+  var fwRunning  = false;
+  var fwAnimId   = null;
+
+  var FW_COLORS = [
+    '#fff9c4','#ffe082','#ffcc02','#ff8f00',
+    '#b2ff59','#69f0ae','#e0f7fa','#ffffff',
+    '#80deea','#f8bbd0','#ce93d8'
+  ];
+
+  function spawnBurst(x, y) {
+    var n = 42 + Math.floor(Math.random() * 22);
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i) / n + (Math.random() - 0.5) * 0.35;
+      var speed = 1.5 + Math.random() * 3.8;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1.0,
+        decay: 0.011 + Math.random() * 0.017,
+        radius: 1.5 + Math.random() * 2.5,
+        color: FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)],
+        trail: []
+      });
+    }
+  }
+
+  var fwSpawnTimer = 0;
+  function fwFrame(ts) {
+    if (!fwRunning) return;
+    ctx2d.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+    if (!fwSpawnTimer || ts - fwSpawnTimer > 370) {
+      fwSpawnTimer = ts;
+      var bx = 60 + Math.random() * (window.innerWidth  - 120);
+      var by = 30 + Math.random() * (window.innerHeight * 0.52);
+      spawnBurst(bx, by);
+    }
+
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.trail.push({ x: p.x, y: p.y });
+      if (p.trail.length > 4) p.trail.shift();
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.vy += 0.058;
+      p.vx *= 0.97;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+      for (var t = 0; t < p.trail.length - 1; t++) {
+        ctx2d.beginPath();
+        ctx2d.moveTo(p.trail[t].x, p.trail[t].y);
+        ctx2d.lineTo(p.trail[t+1].x, p.trail[t+1].y);
+        ctx2d.strokeStyle = p.color;
+        ctx2d.globalAlpha = p.life * (t + 1) / p.trail.length * 0.4;
+        ctx2d.lineWidth   = p.radius * 0.5;
+        ctx2d.stroke();
+      }
+
+      ctx2d.globalAlpha = p.life * 0.9;
+      ctx2d.beginPath();
+      ctx2d.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+      ctx2d.fillStyle   = p.color;
+      ctx2d.shadowColor = p.color;
+      ctx2d.shadowBlur  = 6;
+      ctx2d.fill();
+      ctx2d.shadowBlur  = 0;
+    }
+
+    ctx2d.globalAlpha = 1;
+    fwAnimId = requestAnimationFrame(fwFrame);
+  }
+
+  function startFireworks() {
+    particles = []; fwSpawnTimer = 0; fwRunning = true;
+    fwCanvas.classList.add('visible');
+    fwAnimId = requestAnimationFrame(fwFrame);
+  }
+
+  function stopFireworks() {
+    fwRunning = false;
+    if (fwAnimId) { cancelAnimationFrame(fwAnimId); fwAnimId = null; }
+    // Fade canvas out via class, then clear
+    fwCanvas.classList.remove('visible');
+    setTimeout(function() {
+      ctx2d.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+      particles = [];
+    }, 600);
+  }
+
+  /* ── Hook into renderCount ───────────────────────── */
+  var _origRenderCount = renderCount;
+  renderCount = function(count) {
+    _origRenderCount(count);
+    onPomodoroComplete(count);
+  };
+
+  function onPomodoroComplete(totalCount) {
+    if (isLaunching) return;
+
+    cycleCount++;
+    setFuel(stagingRocket, cycleCount);
+
+    if (cycleCount === 3) {
+      soundLevelUp();
+      launchStagingRocket();
+    }
+  }
+
+  /* ── Boot ────────────────────────────────────────── */
+  // Remove the static rocket from HTML (replaced by dynamic system)
+  var staticRocket = document.getElementById('rocketWrap');
+  if (staticRocket) staticRocket.parentNode.removeChild(staticRocket);
+
+  // Spawn first staging rocket
+  spawnStagingRocket();
+
+})();
+
+/* ============================================================
+   SETTINGS CONTROLLER
+============================================================ */
+(function SettingsController() {
+
+  var btn        = document.getElementById('settingsBtn');
+  var overlay    = document.getElementById('settingsOverlay');
+  var panel      = document.getElementById('settingsPanel');
+  var workValEl  = document.getElementById('workVal');
+  var breakValEl = document.getElementById('breakVal');
+  var applyBtn   = document.getElementById('settingsApply');
+  var card       = document.querySelector('.card');
+
+  var draftWork  = WORK_SECS  / 60;
+  var draftBreak = BREAK_SECS / 60;
+  var WORK_MIN = 1, WORK_MAX = 90;
+  var BREAK_MIN = 1, BREAK_MAX = 30;
+
+  function clamp(v, mn, mx) { return Math.min(mx, Math.max(mn, v)); }
+
+  /* Position gear button right of card, aligned with card's top edge */
+  function positionBtn() {
+    var r = card.getBoundingClientRect();
+    btn.style.top  = r.top + 'px';
+    btn.style.left = (r.right + 10) + 'px';
+  }
+
+  /* Position panel below the gear button */
+  function positionPanel() {
+    var r = btn.getBoundingClientRect();
+    var left = r.left;
+    if (left + 220 > window.innerWidth - 10) left = window.innerWidth - 230;
+    panel.style.top  = (r.bottom + 8) + 'px';
+    panel.style.left = left + 'px';
+  }
+
+  positionBtn();
+  window.addEventListener('resize', positionBtn);
+
+  function openPanel() {
+    draftWork  = WORK_SECS  / 60;
+    draftBreak = BREAK_SECS / 60;
+    workValEl.textContent  = draftWork;
+    breakValEl.textContent = draftBreak;
+    positionBtn();
+    positionPanel();
+    btn.classList.add('open');
+    overlay.classList.add('open');
+    panel.classList.add('open');
+  }
+
+  function closePanel() {
+    btn.classList.remove('open');
+    overlay.classList.remove('open');
+    panel.classList.remove('open');
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.contains('open') ? closePanel() : openPanel();
+  });
+  overlay.addEventListener('click', closePanel);
+
+  document.getElementById('workMinus').addEventListener('click', function() {
+    draftWork = clamp(draftWork - 1, WORK_MIN, WORK_MAX);
+    workValEl.textContent = draftWork;
+  });
+  document.getElementById('workPlus').addEventListener('click', function() {
+    draftWork = clamp(draftWork + 1, WORK_MIN, WORK_MAX);
+    workValEl.textContent = draftWork;
+  });
+  document.getElementById('breakMinus').addEventListener('click', function() {
+    draftBreak = clamp(draftBreak - 1, BREAK_MIN, BREAK_MAX);
+    breakValEl.textContent = draftBreak;
+  });
+  document.getElementById('breakPlus').addEventListener('click', function() {
+    draftBreak = clamp(draftBreak + 1, BREAK_MIN, BREAK_MAX);
+    breakValEl.textContent = draftBreak;
+  });
+
+  applyBtn.addEventListener('click', function() {
+    clearTick();
+    state.running = false;
+    state.autoStartPending = false;
+    renderStartBtn(false);
+
+    WORK_SECS  = draftWork  * 60;
+    BREAK_SECS = draftBreak * 60;
+
+    state.total     = state.mode === 'work' ? WORK_SECS : BREAK_SECS;
+    state.remaining = state.total;
+    state.endTime   = null;
+
+    snapRingFull();
+    renderDigits(state.remaining);
+    renderRing(state.remaining, state.total);
+
+    showToast('⚙ ' + draftWork + ' min work · ' + draftBreak + ' min break');
+    closePanel();
+  });
+
+})();
+
+/* ============================================================
+   EDITABLE MODE BADGE
+============================================================ */
+(function EditableBadge() {
+
+  var label   = document.getElementById('modeLabel');
+  var badge   = document.getElementById('modeBadge');
+
+  // Store the custom work name separately from "Break Time"
+  var customWorkName = 'Work Session';
+
+  // Disable editing during break mode
+  badge.addEventListener('click', function() {
+    if (badge.classList.contains('is-break')) return;
+    label.focus();
+    // Place cursor at end
+    var range = document.createRange();
+    var sel   = window.getSelection();
+    range.selectNodeContents(label);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  });
+
+  label.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); label.blur(); }
+    // Prevent newlines
+    if (e.key === 'Enter' || e.key === 'Tab') e.preventDefault();
+  });
+
+  label.addEventListener('blur', function() {
+    var text = label.textContent.trim();
+    if (!text) {
+      label.textContent = customWorkName;
+      return;
+    }
+    // Cap length
+    if (text.length > 28) {
+      text = text.slice(0, 28);
+      label.textContent = text;
+    }
+    customWorkName = text;
+  });
+
+  // Prevent editing in break mode; restore custom name when switching back
+  // We hook into renderMode by wrapping it
+  var _origRenderMode = renderMode;
+  renderMode = function(mode) {
+    _origRenderMode(mode);
+    if (mode === 'work') {
+      label.contentEditable = 'true';
+      label.textContent = customWorkName;
+    } else {
+      label.contentEditable = 'false';
+    }
+  };
+
+})();
+
+/* ============================================================
+   LEVEL-UP SOUND (Game Boy style)
+   Replaces soundWorkDone only on the 3rd pomodoro of each cycle
+   — triggered by the rocket engine's cycleCount reaching 3.
+   We expose a global hook: window._onThirdPomodoro
+============================================================ */
+function soundLevelUp() {
+  try {
+    var ac = getAudioCtx();
+    var t  = ac.currentTime;
+
+    // Classic Game Boy "level up" — ascending arpeggio then triumphant hold
+    // Uses square wave (closest to DMG sound chip)
+    var melody = [
+      { f: 523,  d: 0.08, s: 0.00 },  // C5
+      { f: 659,  d: 0.08, s: 0.08 },  // E5
+      { f: 784,  d: 0.08, s: 0.16 },  // G5
+      { f: 1047, d: 0.08, s: 0.24 },  // C6
+      { f: 784,  d: 0.06, s: 0.34 },  // G5
+      { f: 1047, d: 0.06, s: 0.41 },  // C6
+      { f: 1319, d: 0.20, s: 0.48 },  // E6 (hold)
+    ];
+
+    melody.forEach(function(n) {
+      var osc = ac.createOscillator();
+      var env = ac.createGain();
+      osc.type = 'square';
+      osc.frequency.value = n.f;
+
+      // Slight vibrato via detune
+      osc.detune.setValueAtTime(0, t + n.s);
+      if (n.d >= 0.15) {
+        // Add vibrato on the held note
+        osc.detune.linearRampToValueAtTime(15, t + n.s + 0.05);
+        osc.detune.linearRampToValueAtTime(-15, t + n.s + 0.10);
+        osc.detune.linearRampToValueAtTime(0, t + n.s + 0.15);
+      }
+
+      env.gain.setValueAtTime(0, t + n.s);
+      env.gain.linearRampToValueAtTime(0.18, t + n.s + 0.01);
+      env.gain.setValueAtTime(0.18, t + n.s + n.d - 0.02);
+      env.gain.linearRampToValueAtTime(0, t + n.s + n.d);
+
+      osc.connect(env);
+      env.connect(ac.destination);
+      osc.start(t + n.s);
+      osc.stop(t + n.s + n.d + 0.01);
+    });
+
+    // Final sparkle flourish — high-pitched sweep
+    var sweep = ac.createOscillator();
+    var sweepEnv = ac.createGain();
+    sweep.type = 'square';
+    sweep.frequency.setValueAtTime(1319, t + 0.70);
+    sweep.frequency.exponentialRampToValueAtTime(2637, t + 0.90);
+    sweepEnv.gain.setValueAtTime(0.10, t + 0.70);
+    sweepEnv.gain.exponentialRampToValueAtTime(0.001, t + 0.92);
+    sweep.connect(sweepEnv);
+    sweepEnv.connect(ac.destination);
+    sweep.start(t + 0.70);
+    sweep.stop(t + 0.93);
+
+  } catch(e) {}
+}
+
+/* ============================================================
+   SESSION HISTORY  — persisted via window.storage
+   Key format:  "pomo:YYYY-MM-DD"  → minutes (number, cumulative)
+============================================================ */
+function todayKey() {
+  var d = new Date();
+  return 'pomo:' + d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2,'0') + '-'
+    + String(d.getDate()).padStart(2,'0');
+}
+
+async function recordFocusMinutes(mins) {
+  try {
+    var key = todayKey();
+    var existing = 0;
+    try {
+      var res = await window.storage.get(key);
+      if (res) existing = Number(res.value) || 0;
+    } catch(e) { existing = 0; }
+    await window.storage.set(key, String(existing + mins));
+  } catch(e) { console.warn('History storage error:', e); }
+}
+
+async function loadMonthData(year, month) {
+  // month: 0-indexed (JS style)
+  var prefix = 'pomo:' + year + '-' + String(month + 1).padStart(2,'0') + '-';
+  var days = new Date(year, month + 1, 0).getDate(); // days in month
+  var data = new Array(days).fill(0);
+  try {
+    var listRes = await window.storage.list('pomo:');
+    if (listRes && listRes.keys) {
+      for (var i = 0; i < listRes.keys.length; i++) {
+        var k = listRes.keys[i];
+        if (k.startsWith(prefix)) {
+          var day = parseInt(k.slice(prefix.length), 10);
+          if (day >= 1 && day <= days) {
+            try {
+              var valRes = await window.storage.get(k);
+              data[day - 1] = valRes ? (Number(valRes.value) || 0) : 0;
+            } catch(e) {}
+          }
+        }
+      }
+    }
+  } catch(e) { console.warn('History load error:', e); }
+  return data;
+}
+
+/* ============================================================
+   CHART CONTROLLER
+============================================================ */
+(function ChartController() {
+
+  var overlay   = document.getElementById('chartOverlay');
+  var closeBtn  = document.getElementById('chartClose');
+  var prevBtn   = document.getElementById('chartPrev');
+  var nextBtn   = document.getElementById('chartNext');
+  var monthLbl  = document.getElementById('chartMonthLabel');
+  var summary   = document.getElementById('chartSummary');
+  var canvas    = document.getElementById('chartCanvas');
+  var graphBtn  = document.getElementById('graphBtn');
+
+  var MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+
+  var now      = new Date();
+  var viewYear  = now.getFullYear();
+  var viewMonth = now.getMonth();
+
+  /* ── Open / close ──────────────────────────────── */
+  graphBtn.addEventListener('click', function() {
+    viewYear  = now.getFullYear();
+    viewMonth = now.getMonth();
+    overlay.classList.add('open');
+    renderChart();
+  });
+
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) close();
+  });
+
+  function close() { overlay.classList.remove('open'); }
+
+  /* ── Month navigation ──────────────────────────── */
+  prevBtn.addEventListener('click', function() {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderChart();
+  });
+  nextBtn.addEventListener('click', function() {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderChart();
+  });
+
+  /* ── Draw ──────────────────────────────────────── */
+  async function renderChart() {
+    monthLbl.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+    summary.innerHTML = '<span style="color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:.06em">Loading…</span>';
+
+    var data  = await loadMonthData(viewYear, viewMonth);
+    var days  = data.length;
+    var max   = Math.max(...data, 1);
+    var total = data.reduce(function(a,b){ return a+b; }, 0);
+    var best  = Math.max(...data);
+    var activeDays = data.filter(function(v){ return v > 0; }).length;
+
+    // ── Canvas sizing ──
+    var wrap  = canvas.parentElement;
+    var W     = wrap.clientWidth  || 420;
+    var H     = wrap.clientHeight || 180;
+    canvas.width  = W * (window.devicePixelRatio || 1);
+    canvas.height = H * (window.devicePixelRatio || 1);
+    var ctx   = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, W, H);
+
+    if (total === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.font = '12px "Exo 2", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No sessions recorded this month', W / 2, H / 2);
+      summary.innerHTML = '';
+      return;
+    }
+
+    var PAD_L  = 36, PAD_R = 10, PAD_T = 12, PAD_B = 28;
+    var chartW = W - PAD_L - PAD_R;
+    var chartH = H - PAD_T - PAD_B;
+    var barW   = Math.max(2, chartW / days - 3);
+    var slot   = chartW / days;
+
+    // ── Horizontal guide lines ──
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var gy = PAD_T + chartH - (s / steps) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(PAD_L, gy); ctx.lineTo(PAD_L + chartW, gy);
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      if (s > 0) {
+        var lv = Math.round((s / steps) * max);
+        ctx.fillStyle = 'rgba(255,255,255,0.28)';
+        ctx.font = '9px "Exo 2", sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(lv, PAD_L - 4, gy + 3);
+      }
+    }
+
+    // ── Bars ──
+    var todayD = new Date();
+    var isThisMonth = (viewYear === todayD.getFullYear() && viewMonth === todayD.getMonth());
+
+    for (var d = 0; d < days; d++) {
+      var val   = data[d];
+      var bh    = val > 0 ? Math.max(3, (val / max) * chartH) : 0;
+      var bx    = PAD_L + d * slot + (slot - barW) / 2;
+      var by    = PAD_T + chartH - bh;
+      var isToday = isThisMonth && (d + 1 === todayD.getDate());
+
+      if (val > 0) {
+        // Bar gradient
+        var grad = ctx.createLinearGradient(0, by, 0, by + bh);
+        grad.addColorStop(0, isToday ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.62)');
+        grad.addColorStop(1, isToday ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.20)');
+        ctx.fillStyle = grad;
+        var r = Math.min(3, barW / 2);
+        ctx.beginPath();
+        ctx.moveTo(bx + r, by);
+        ctx.lineTo(bx + barW - r, by);
+        ctx.quadraticCurveTo(bx + barW, by, bx + barW, by + r);
+        ctx.lineTo(bx + barW, by + bh);
+        ctx.lineTo(bx, by + bh);
+        ctx.lineTo(bx, by + r);
+        ctx.quadraticCurveTo(bx, by, bx + r, by);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Day label — show every 5th or today
+      if ((d + 1) % 5 === 0 || d === 0 || isToday) {
+        ctx.fillStyle = isToday ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.30)';
+        ctx.font = (isToday ? '600 ' : '') + '8px "Exo 2", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d + 1, bx + barW / 2, H - PAD_B + 11);
+      }
+    }
+
+    // ── Summary stats ──
+    var hh = Math.floor(total / 60), mm = total % 60;
+    var totalStr = hh > 0 ? hh + 'h ' + mm + 'm' : mm + 'm';
+    summary.innerHTML =
+      '<div class="chart-stat"><span class="chart-stat-val">' + totalStr + '</span><span class="chart-stat-lbl">Total Focus</span></div>' +
+      '<div class="chart-stat"><span class="chart-stat-val">' + best + 'm</span><span class="chart-stat-lbl">Best Day</span></div>' +
+      '<div class="chart-stat"><span class="chart-stat-val">' + activeDays + '</span><span class="chart-stat-lbl">Active Days</span></div>';
+  }
+
+  // Redraw on resize while open
+  window.addEventListener('resize', function() {
+    if (overlay.classList.contains('open')) renderChart();
+  });
+
+})();
+
+/* ============================================================
+   THEME PICKER
+============================================================ */
+(function ThemePicker() {
+  var swatches = document.querySelectorAll('.theme-swatch');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme === 'green' ? '' : theme);
+    swatches.forEach(function(s) {
+      s.classList.toggle('active', s.getAttribute('data-theme') === theme);
+    });
+  }
+
+  swatches.forEach(function(swatch) {
+    swatch.addEventListener('click', function() {
+      applyTheme(this.getAttribute('data-theme'));
+    });
+  });
+})();
+</script>
+</body>
+</html>
